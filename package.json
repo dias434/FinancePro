@@ -1,0 +1,32 @@
+{
+  "name": "financepro",
+  "private": true,
+  "packageManager": "pnpm@10.15.1",
+  "scripts": {
+    "dev": "pnpm --dir apps/web dev",
+    "dev:web": "pnpm --dir apps/web dev",
+    "dev:mobile": "pnpm --dir apps/mobile start",
+    "dev:api": "pnpm --dir apps/api dev",
+    "test:api:unit": "pnpm --dir apps/api test:unit",
+    "test:api:unit:coverage": "pnpm --dir apps/api test:unit:coverage",
+    "test:api:coverage:gate": "pnpm --dir apps/api test:unit:coverage:gate",
+    "test:api:e2e": "pnpm --dir apps/api test:e2e",
+    "test:api:smoke": "pnpm --dir apps/api test:smoke",
+    "test:mobile:smoke": "pnpm --dir apps/mobile test:smoke",
+    "test:smoke": "pnpm test:mobile:smoke",
+    "build": "pnpm --dir apps/web build && pnpm --dir apps/api build",
+    "lint": "pnpm --dir apps/web lint",
+    "start": "pnpm --dir apps/web start"
+  },
+  "dependencies": {
+    "lucide-react": "^0.454.0",
+    "react": "19.2.0",
+    "react-dom": "19.2.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.7",
+    "@types/react-dom": "^19.2.3",
+    "metro-runtime": "^0.83.3",
+    "typescript": "^5.9.3"
+  }
+}

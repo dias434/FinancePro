@@ -1,0 +1,40 @@
+{
+  "expo": {
+    "name": "FinancePro",
+    "slug": "financepro",
+    "scheme": "financepro",
+    "description": "FinancePro mobile app for personal finance control.",
+    "platforms": [
+      "android",
+      "ios"
+    ],
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "backgroundColor": "#0B1220"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.financepro.mobile",
+      "buildNumber": "1"
+    },
+    "android": {
+      "package": "com.financepro.mobile",
+      "versionCode": 1,
+      "adaptiveIcon": {
+        "backgroundColor": "#0B1220"
+      }
+    },
+    "extra": {
+      "apiUrl": "${EXPO_PUBLIC_API_URL}",
+      "eas": {
+        "projectId": "${EXPO_PUBLIC_EAS_PROJECT_ID}"
+      }
+    },
+    "plugins": [
+      "expo-secure-store",
+      "expo-notifications"
+    ]
+  }
+}

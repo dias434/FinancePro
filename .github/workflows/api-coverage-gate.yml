@@ -1,0 +1,46 @@
+name: api-coverage-gate
+
+on:
+  pull_request:
+    paths:
+      - "apps/api/**"
+      - "package.json"
+      - "pnpm-lock.yaml"
+      - ".github/workflows/api-coverage-gate.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "apps/api/**"
+      - "package.json"
+      - "pnpm-lock.yaml"
+      - ".github/workflows/api-coverage-gate.yml"
+
+jobs:
+  api-tests-and-coverage:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.15.1
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: API unit tests
+        run: pnpm test:api:unit
+
+      - name: API coverage gate (>= 70% lines)
+        run: pnpm test:api:coverage:gate

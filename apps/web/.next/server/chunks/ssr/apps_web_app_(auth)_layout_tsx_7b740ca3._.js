@@ -1,0 +1,3 @@
+module.exports=[10073,a=>{"use strict";var b=a.i(20460);function c({children:a}){return(0,b.jsx)("main",{className:"min-h-svh bg-gradient-to-b from-background to-muted",children:(0,b.jsx)("div",{className:"mx-auto flex min-h-svh w-full max-w-5xl items-center justify-center p-6 md:p-10",children:a})})}a.s(["default",()=>c])}];
+
+//# sourceMappingURL=apps_web_app_%28auth%29_layout_tsx_7b740ca3._.js.map

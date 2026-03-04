@@ -1,0 +1,4 @@
+ALTER TABLE "Transaction"
+  ADD COLUMN "tags" TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
+  ADD COLUMN "costCenter" TEXT,
+  ADD COLUMN "notes" TEXT;

@@ -1,0 +1,12 @@
+{
+  "folders": [
+    { "path": "apps/web" },
+    { "path": "apps/api" },
+    { "path": "apps/mobile" },
+    { "path": "docs" }
+  ],
+  "settings": {
+    "typescript.tsserver.experimental.enableProjectDiagnostics": true,
+    "prisma.pinToPrisma6": true
+  }
+}

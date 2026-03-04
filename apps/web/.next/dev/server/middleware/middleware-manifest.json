@@ -1,0 +1,31 @@
+{
+  "sorted_middleware": [],
+  "middleware": {
+    "/": {
+      "files": [
+        "server/edge/chunks/_462a3df4._.js",
+        "server/edge/chunks/[root-of-the-server]__22184c23._.js",
+        "server/edge/chunks/turbopack-apps_web_edge-wrapper_f9859707.js"
+      ],
+      "name": "middleware",
+      "page": "/",
+      "matchers": [
+        {
+          "regexp": "/:nextData(_next/data/[^/]{1,})?/((?!api|_next/static|_next/image|favicon.ico|icon|apple-icon.png).*){(\\\\.json)}?",
+          "originalSource": "/((?!api|_next/static|_next/image|favicon.ico|icon|apple-icon.png).*)"
+        }
+      ],
+      "wasm": [],
+      "assets": [],
+      "env": {
+        "__NEXT_BUILD_ID": "development",
+        "NEXT_SERVER_ACTIONS_ENCRYPTION_KEY": "GpaJ5znd/SXY59dJSTasnjZ/4xkljzEJKBjijt2st5o=",
+        "__NEXT_PREVIEW_MODE_ID": "bf3b48b7faac1f00610d9f9872845ab2",
+        "__NEXT_PREVIEW_MODE_ENCRYPTION_KEY": "c6cb0a3983319b28e512f8d818234f2c9da6b131b694823176bf110c4cc89a6b",
+        "__NEXT_PREVIEW_MODE_SIGNING_KEY": "ba9dbc0a27760758b16370e80437a651387f0ce495ec8c5c5d330b56f4cf2feb"
+      }
+    }
+  },
+  "instrumentation": null,
+  "functions": {}
+}

@@ -1,0 +1,19 @@
+{
+  "/(app)/accounts/page": "/accounts",
+  "/(app)/budgets/page": "/budgets",
+  "/(app)/categories/page": "/categories",
+  "/(app)/dashboard/page": "/dashboard",
+  "/(app)/goals/page": "/goals",
+  "/(app)/settings/page": "/settings",
+  "/(app)/transactions/page": "/transactions",
+  "/(auth)/login/page": "/login",
+  "/(auth)/register/page": "/register",
+  "/_global-error/page": "/_global-error",
+  "/_not-found/page": "/_not-found",
+  "/api/auth/login/route": "/api/auth/login",
+  "/api/auth/logout/route": "/api/auth/logout",
+  "/api/auth/me/route": "/api/auth/me",
+  "/api/auth/refresh/route": "/api/auth/refresh",
+  "/api/auth/register/route": "/api/auth/register",
+  "/page": "/"
+}

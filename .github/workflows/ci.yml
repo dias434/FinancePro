@@ -1,0 +1,159 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main, develop]
+  push:
+    branches: [main, develop]
+
+jobs:
+  api:
+    name: API
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.15.1
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Prisma generate
+        run: pnpm --dir apps/api prisma:generate
+
+      - name: Typecheck & build
+        run: pnpm --dir apps/api build
+
+      - name: Unit tests
+        run: pnpm test:api:unit
+
+      - name: Coverage gate (>= 70%)
+        run: pnpm test:api:coverage:gate
+
+  api-e2e:
+    name: API E2E
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: api
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: financepro
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready -U postgres
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/financepro
+      JWT_ACCESS_SECRET: ci-access-secret-min-32-chars
+      JWT_REFRESH_SECRET: ci-refresh-secret-min-32-chars
+      NODE_ENV: test
+      PORT: 3001
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.15.1
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Prisma migrate
+        run: pnpm --dir apps/api prisma:migrate:deploy
+
+      - name: Build API
+        run: pnpm --dir apps/api build
+
+      - name: Start API
+        run: nohup pnpm --dir apps/api start > /tmp/api.log 2>&1 &
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/financepro
+          JWT_ACCESS_SECRET: ci-access-secret-min-32-chars
+          JWT_REFRESH_SECRET: ci-refresh-secret-min-32-chars
+          NODE_ENV: test
+          PORT: 3001
+
+      - name: Wait for API
+        run: |
+          for i in $(seq 1 30); do
+            if curl -sf http://localhost:3001/health; then
+              echo "API ready"
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "API failed to start"
+          cat /tmp/api.log 2>/dev/null || true
+          exit 1
+
+      - name: E2E tests
+        run: pnpm test:api:e2e
+        env:
+          API_BASE_URL: http://localhost:3001
+
+  mobile:
+    name: Mobile
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.15.1
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Typecheck
+        run: pnpm exec tsc --noEmit
+        working-directory: apps/mobile
+
+      - name: Smoke tests
+        run: pnpm test:mobile:smoke
+
+  web:
+    name: Web
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.15.1
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm --dir apps/web lint
+
+      - name: Build
+        run: pnpm --dir apps/web build

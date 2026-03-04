@@ -1,0 +1,47 @@
+# Pipeline de release: staging -> producao
+# Ver docs/deploy-rollback.md para processo de rollback
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Ambiente de deploy"
+        required: true
+        default: staging
+        type: choice
+        options:
+          - staging
+          - production
+
+jobs:
+  release:
+    name: Deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment: ${{ github.event.inputs.environment }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.15.1
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Build API
+        run: pnpm --dir apps/api build
+
+      - name: Build Web
+        run: pnpm --dir apps/web build
+
+      - name: Deploy
+        run: |
+          echo "Deploy para ${{ github.event.inputs.environment }}"
+          echo "Configure integracao com seu provedor (Vercel, Railway, etc.)"
+          echo "Ou use artifacts/containers para publicar"

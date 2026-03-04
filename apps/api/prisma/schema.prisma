@@ -1,0 +1,356 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum AccountType {
+  CHECKING
+  SAVINGS
+  CASH
+  CREDIT
+}
+
+enum CategoryType {
+  INCOME
+  EXPENSE
+}
+
+enum TransactionType {
+  INCOME
+  EXPENSE
+  TRANSFER
+}
+
+enum SystemAlertType {
+  BUDGET_THRESHOLD
+  BUDGET_OVER_LIMIT
+  GOAL_DUE_SOON
+  GOAL_OVERDUE
+  BILL_DUE_SOON
+  BILL_OVERDUE
+  SPENDING_SPIKE_WEEKLY
+  SPENDING_SPIKE_MONTHLY
+}
+
+enum RecurringFrequency {
+  WEEKLY
+  MONTHLY
+  ANNUAL
+}
+
+enum RecurringStatus {
+  ACTIVE
+  PAUSED
+  CANCELLED
+}
+
+enum SystemAlertStatus {
+  ACTIVE
+  READ
+  RESOLVED
+}
+
+enum ImportFormat {
+  CSV
+  OFX
+}
+
+enum ImportStatus {
+  COMPLETED
+  FAILED
+  ROLLED_BACK
+}
+
+enum ImportItemStatus {
+  IMPORTED
+  DUPLICATE
+  ERROR
+  ROLLED_BACK
+}
+
+model User {
+  id           String         @id @default(uuid())
+  email        String         @unique
+  name         String?
+  passwordHash String
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+
+  refreshTokens         RefreshToken[]
+  accounts              Account[]
+  reconciliationRecords ReconciliationRecord[]
+  categories          Category[]
+  transactions        Transaction[]
+  budgets             Budget[]
+  goals               Goal[]
+  systemAlerts        SystemAlert[]
+  pushDevices         PushNotificationDevice[]
+  importLogs          ImportLog[]
+  recurringTransactions RecurringTransaction[]
+}
+
+model RefreshToken {
+  id               String       @id @default(uuid())
+  userId           String
+  user             User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  tokenHash        String       @unique
+  createdAt        DateTime     @default(now())
+  expiresAt        DateTime
+  revokedAt        DateTime?
+
+  replacedByTokenId String?
+  replacedByToken   RefreshToken? @relation("RefreshTokenReplacedBy", fields: [replacedByTokenId], references: [id])
+  replaces          RefreshToken[] @relation("RefreshTokenReplacedBy")
+
+  @@index([userId])
+}
+
+model Account {
+  id          String      @id @default(uuid())
+  userId      String
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name        String
+  type        AccountType @default(CHECKING)
+  currency    String      @default("BRL")
+  limitCents  Int?
+  closingDay  Int?
+  dueDay      Int?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  transactions         Transaction[]
+  incomingTransfers    Transaction[]       @relation("TransferAccount")
+  creditCardBills      CreditCardBill[]
+  reconciliationRecords ReconciliationRecord[]
+  recurringTransactions RecurringTransaction[]
+
+  @@index([userId])
+  @@unique([userId, name])
+}
+
+model CreditCardBill {
+  id         String    @id @default(uuid())
+  accountId  String
+  account    Account   @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  month      DateTime
+  dueDate    DateTime
+  totalCents Int       @default(0)
+  paidCents  Int       @default(0)
+  closedAt   DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  @@unique([accountId, month])
+  @@index([accountId])
+}
+
+model ReconciliationRecord {
+  id                   String   @id @default(uuid())
+  accountId            String
+  account              Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  userId               String
+  user                 User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  recordedAt           DateTime
+  expectedBalanceCents Int
+  actualBalanceCents   Int
+  note                 String?
+  createdAt            DateTime @default(now())
+
+  @@index([accountId, recordedAt])
+}
+
+model RecurringTransaction {
+  id                    String            @id @default(uuid())
+  userId                String
+  user                  User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accountId             String
+  account               Account           @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  categoryId            String?
+  category              Category?         @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  type                  TransactionType
+  amountCents           Int
+  description           String?
+  frequency             RecurringFrequency
+  startDate             DateTime
+  endDate               DateTime?
+  nextRunAt             DateTime
+  status                RecurringStatus   @default(ACTIVE)
+  createdAt             DateTime          @default(now())
+  updatedAt             DateTime          @updatedAt
+
+  generatedTransactions Transaction[]
+
+  @@index([userId, status, nextRunAt])
+}
+
+model Category {
+  id        String       @id @default(uuid())
+  userId    String
+  user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name      String
+  type      CategoryType @default(EXPENSE)
+  icon      String?
+  color     String?
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  transactions          Transaction[]
+  budgets               Budget[]
+  recurringTransactions RecurringTransaction[]
+
+  @@index([userId])
+  @@unique([userId, name])
+}
+
+model Transaction {
+  id                     String               @id @default(uuid())
+  userId                 String
+  user                   User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accountId              String
+  account                Account              @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  categoryId             String?
+  category               Category?            @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  transferAccountId      String?
+  transferAccount        Account?             @relation("TransferAccount", fields: [transferAccountId], references: [id], onDelete: SetNull)
+  type                   TransactionType      @default(EXPENSE)
+  amountCents            Int
+  occurredAt             DateTime
+  description            String?
+  tags                   String[]             @default([])
+  costCenter             String?
+  notes                  String?
+  installmentGroupId     String?
+  installmentIndex       Int?
+  installmentTotal       Int?
+  recurringTransactionId String?
+  recurringTransaction   RecurringTransaction? @relation(fields: [recurringTransactionId], references: [id], onDelete: SetNull)
+  createdAt              DateTime             @default(now())
+  updatedAt              DateTime             @updatedAt
+
+  @@index([userId, occurredAt])
+  @@index([accountId, occurredAt])
+  @@index([categoryId])
+  @@index([transferAccountId])
+  @@index([installmentGroupId])
+}
+
+model Budget {
+  id           String   @id @default(uuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  categoryId   String
+  category     Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  month        DateTime
+  limitCents   Int
+  alertPercent Int      @default(80)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([userId, month])
+  @@index([categoryId])
+  @@unique([userId, categoryId, month])
+}
+
+model Goal {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name        String
+  targetCents Int
+  currentCents Int     @default(0)
+  targetDate  DateTime
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([userId, targetDate])
+}
+
+model SystemAlert {
+  id               String            @id @default(uuid())
+  userId           String
+  user             User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type             SystemAlertType
+  status           SystemAlertStatus @default(ACTIVE)
+  dedupeKey        String            @unique
+  sourceId         String
+  title            String
+  message          String
+  payload          Json?
+  firstTriggeredAt DateTime          @default(now())
+  lastTriggeredAt  DateTime          @default(now())
+  readAt           DateTime?
+  resolvedAt       DateTime?
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+
+  @@index([userId, status, createdAt])
+  @@index([userId, type, status])
+  @@index([status, lastTriggeredAt])
+}
+
+model PushNotificationDevice {
+  id               String   @id @default(uuid())
+  userId           String
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token            String   @unique
+  platform         String
+  deviceName       String?
+  isActive         Boolean  @default(true)
+  lastRegisteredAt DateTime @default(now())
+  disabledAt       DateTime?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@index([userId, isActive, updatedAt])
+}
+
+model ImportLog {
+  id             String       @id @default(uuid())
+  userId         String
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  format         ImportFormat
+  fileName       String
+  status         ImportStatus @default(COMPLETED)
+  mapping        Json?
+  defaults       Json?
+  totalRows      Int          @default(0)
+  importedRows   Int          @default(0)
+  duplicateRows  Int          @default(0)
+  errorRows      Int          @default(0)
+  replayedFromId String?
+  replayedFrom   ImportLog?   @relation("ImportReplay", fields: [replayedFromId], references: [id], onDelete: SetNull)
+  replays        ImportLog[]  @relation("ImportReplay")
+  completedAt    DateTime?
+  rolledBackAt   DateTime?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  items          ImportLogItem[]
+
+  @@index([userId, createdAt])
+  @@index([userId, status, createdAt])
+}
+
+model ImportLogItem {
+  id            String           @id @default(uuid())
+  importLogId   String
+  importLog     ImportLog        @relation(fields: [importLogId], references: [id], onDelete: Cascade)
+  rowIndex      Int
+  status        ImportItemStatus
+  dedupeKey     String?
+  raw           Json?
+  normalized    Json?
+  errorMessage  String?
+  transactionId String?
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+
+  @@index([importLogId, rowIndex])
+  @@index([importLogId, status])
+  @@index([transactionId])
+}

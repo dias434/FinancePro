@@ -1,0 +1,41 @@
+{
+  "name": "@financepro/api",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "tsx watch src/main.ts",
+    "build": "tsc -p tsconfig.build.json",
+    "start": "node dist/main.js",
+    "test:unit": "tsc -p tsconfig.unit-tests.json && node --experimental-test-isolation=none --test .unit-tests/tests/unit/auth.service.spec.js .unit-tests/tests/unit/transactions.service.spec.js .unit-tests/tests/unit/imports.service.spec.js .unit-tests/tests/unit/budgets.service.spec.js .unit-tests/tests/unit/goals.service.spec.js .unit-tests/tests/unit/rate-limit.guard.spec.js .unit-tests/tests/unit/cors.config.spec.js",
+    "test:unit:coverage": "tsc -p tsconfig.unit-tests.json && node --experimental-test-isolation=none --test --experimental-test-coverage .unit-tests/tests/unit/auth.service.spec.js .unit-tests/tests/unit/transactions.service.spec.js .unit-tests/tests/unit/imports.service.spec.js .unit-tests/tests/unit/budgets.service.spec.js .unit-tests/tests/unit/goals.service.spec.js .unit-tests/tests/unit/rate-limit.guard.spec.js .unit-tests/tests/unit/cors.config.spec.js",
+    "test:unit:coverage:gate": "tsc -p tsconfig.unit-tests.json && node --experimental-test-isolation=none --test --experimental-test-coverage --test-coverage-lines=70 --test-coverage-exclude=.unit-tests/tests/** .unit-tests/tests/unit/auth.service.spec.js .unit-tests/tests/unit/transactions.service.spec.js .unit-tests/tests/unit/imports.service.spec.js .unit-tests/tests/unit/budgets.service.spec.js .unit-tests/tests/unit/goals.service.spec.js .unit-tests/tests/unit/rate-limit.guard.spec.js .unit-tests/tests/unit/cors.config.spec.js",
+    "test:e2e": "node scripts/e2e-api.mjs",
+    "test:smoke": "node scripts/smoke-api.mjs",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:migrate:deploy": "prisma migrate deploy",
+    "prisma:studio": "prisma studio"
+  },
+  "dependencies": {
+    "@nestjs/common": "^10.4.20",
+    "@nestjs/config": "^3.3.0",
+    "@nestjs/core": "^10.4.20",
+    "@nestjs/jwt": "^10.2.0",
+    "@nestjs/platform-express": "^10.4.20",
+    "@prisma/client": "^6.5.0",
+    "bcryptjs": "^2.4.3",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.2",
+    "helmet": "^8.1.0",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.1",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/node": "^22",
+    "prisma": "^6.5.0",
+    "tsx": "^4.19.4",
+    "typescript": "^5"
+  }
+}

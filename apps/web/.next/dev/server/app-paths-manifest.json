@@ -1,0 +1,13 @@
+{
+  "/(app)/accounts/page": "app/(app)/accounts/page.js",
+  "/(app)/budgets/page": "app/(app)/budgets/page.js",
+  "/(app)/categories/page": "app/(app)/categories/page.js",
+  "/(app)/dashboard/page": "app/(app)/dashboard/page.js",
+  "/(app)/goals/page": "app/(app)/goals/page.js",
+  "/(app)/settings/page": "app/(app)/settings/page.js",
+  "/(app)/transactions/page": "app/(app)/transactions/page.js",
+  "/(auth)/register/page": "app/(auth)/register/page.js",
+  "/api/auth/me/route": "app/api/auth/me/route.js",
+  "/api/auth/register/route": "app/api/auth/register/route.js",
+  "/api/dashboard/summary/route": "app/api/dashboard/summary/route.js"
+}

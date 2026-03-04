@@ -1,0 +1,5 @@
+1:"$Sreact.fragment"
+2:I[89882,["/_next/static/chunks/10a68886ac5bf338.js","/_next/static/chunks/bc97be354108d800.js"],"OutletBoundary"]
+3:"$Sreact.suspense"
+0:{"buildId":"WSsTGJoJ_c7JMsA0EXOhd","rsc":["$","$1","c",{"children":[["$","div",null,{"className":"p-4 md:p-6","children":[["$","div",null,{"className":"mb-4 flex items-start justify-between gap-3","children":[["$","div",null,{"className":"min-w-0","children":[["$","h1",null,{"className":"truncate text-lg font-semibold tracking-tight md:text-xl","children":"Metas"}],["$","p",null,{"className":"text-muted-foreground mt-1 text-sm","children":"Objetivos e progresso"}]]}],null]}],["$","div",null,{"data-slot":"empty","className":"flex min-w-0 flex-1 flex-col items-center justify-center gap-6 rounded-lg border-dashed p-6 text-center text-balance md:p-12","title":"Metas","description":"Crie metas (ex: juntar X até data Y) e acompanhe o progresso."}]]}],null,["$","$L2",null,{"children":["$","$3",null,{"name":"Next.MetadataOutlet","children":"$@4"}]}]]}],"loading":null,"isPartial":false}
+4:null
