@@ -29,12 +29,18 @@
     "extra": {
       "apiUrl": "${EXPO_PUBLIC_API_URL}",
       "eas": {
-        "projectId": "${EXPO_PUBLIC_EAS_PROJECT_ID}"
+        "projectId": "a4df0f7b-6c84-4ccc-801c-927aad35e293"
       }
     },
     "plugins": [
       "expo-secure-store",
       "expo-notifications"
-    ]
+    ],
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/a4df0f7b-6c84-4ccc-801c-927aad35e293"
+    }
   }
 }
